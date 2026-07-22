@@ -1,0 +1,219 @@
+Artifacts#
+This page reports the list of all the artifacts that can be produced by rev.ng.
+
+lift artifact#
+
+revng artifact lift
+Step: lift
+
+File name: root.bc.zstd
+
+The root function produced by the lifting phase. It's a single large function containing all of the executable code identified in the binary.
+
+isolate artifact#
+
+revng artifact isolate
+Step: isolate
+
+File name: functions.bc.zstd
+
+This artifact contains an LLVM function for each function in the input program. The functions still employ global variables (CSVs) to pass and return data. Therefore, they lack arguments and return values.
+
+enforce-abi artifact#
+
+revng artifact enforce-abi
+Step: enforce-abi
+
+File name: functions.bc.zstd
+
+This artifact contains an LLVM function for each function in the input program. The functions no longer use global variables (CSVs) to communicate: each register is promoted to a local variable, an argument and/or a return value.
+
+This means that, for instance, a function using the SystemV ABI for x86-64 that has two uint8_t arguments, will have two 64-bits registers, not two 8-bits registers. This reflects the fact that in the considered ABI, two uint8_t arguments are passed on the rdi and rsi registers.
+
+The stack pointer is an exception: it's still used as a CSV. As a consequence, stack arguments are not promoted to actual arguments: they are accessed with pointer arithmetic w.r.t. the stack pointer CSV.
+
+emit-cfg artifact#
+
+revng artifact emit-cfg
+Step: emit-cfg
+
+File name: cfg.yml.tar.gz
+
+This artifact is an archive containing one YAML file for each function. Each document contains information about the control-flow graph of each function.
+
+hexdump artifact#
+
+revng artifact hexdump
+Step: hexdump
+
+File name: hex.dump
+
+This artifact contains a hex dump of each segment in the input binary.
+
+render-svg-call-graph artifact#
+
+revng artifact render-svg-call-graph
+Step: render-svg-call-graph
+
+File name: call-graph.svg.yml
+
+This artifact is an SVG representing the call graph of the input program.
+
+render-svg-call-graph-slice artifact#
+
+revng artifact render-svg-call-graph-slice
+Step: render-svg-call-graph-slice
+
+File name: call-graph-slice.svg.tar.gz
+
+This artifact is an archive of SVG files. Each file represents a subset of the call graph considering only the functions called/calling, directly or indirectly, the given function.
+
+disassemble artifact#
+
+revng artifact disassemble
+Step: disassemble
+
+File name: assembly.ptml.tar.gz
+
+This artifact is an archive of PTML files. Each file represents the disassembly of the given function.
+
+render-svg-cfg artifact#
+
+revng artifact render-svg-cfg
+Step: render-svg-cfg
+
+File name: cfg.svg.tar.gz
+
+This artifact is an archive of SVG files. Each file represents the CFG of the given function.
+
+recompile artifact#
+
+revng artifact recompile
+Step: recompile
+
+File name: output
+
+This artifact is translated version of the input binary. Specifically, it's an ELF executable for Linux x86-64 containing the root function plus the required runtime.
+
+recompile-isolated artifact#
+
+revng artifact recompile-isolated
+Step: recompile-isolated
+
+File name: output
+
+This artifact is translated version of the input binary. Specifically, it's an ELF executable for Linux x86-64 containing the root function, all the isolated functions plus the required runtime.
+
+simplify-switch artifact#
+
+revng artifact simplify-switch
+Step: simplify-switch
+
+File name: functions.bc.zstd
+
+This artifact contains an LLVM function for each function in the input program. The stack pointer has been promoted to a local variable and initialized with the result of an opaque function call.
+
+make-segment-ref artifact#
+
+revng artifact make-segment-ref
+Step: make-segment-ref
+
+File name: functions.bc.zstd
+
+This artifact contains an LLVM function for each function in the input program. The functions have an argument for each argument in the input prototype.
+
+Unlike upstream artifacts, the arguments are not tied to the register containing them. So, if a function using the x86-64 SystemV ABI has two uint8_t arguments, they will appear as two distinct arguments, as opposed to being merged in a single argument representing rdi.
+
+Additionally, this artifact correctly represent each stack argument in the function prototype.
+
+decompile artifact#
+
+revng artifact decompile
+Step: decompile
+
+File name: decompiled.tar.gz
+
+This artifact is an archive of PTML file representing the C code of the program's functions.
+
+decompile-to-single-file artifact#
+
+revng artifact decompile-to-single-file
+Step: decompile-to-single-file
+
+File name: decompiled.c
+
+This artifact is a single PTML file representing the decompiled C code of the whole program, including the body of all of program's functions.
+
+emit-recompilable-archive artifact#
+
+revng artifact emit-recompilable-archive
+Step: emit-recompilable-archive
+
+File name: recompilable-archive.tar.gz
+
+This artifact is an archive containing all the files necessary to recompile the decompiled C code of the input program. These files are not in PTML, they are plain C.
+
+It contains:
+
+functions.c: the decompile-to-single-file artifact;
+types-and-globals.h: see the emit-model-header artifact;
+helpers.h: see the emit-helpers-header artifact;
+attributes.h: an helper header file defining a set of annotations used by the decompiled C source files;
+primitive-types.h: a header defining all the primitive types.
+emit-helpers-header artifact#
+
+revng artifact emit-helpers-header
+Step: emit-helpers-header
+
+File name: helpers.h
+
+This artifact contains the declarations of all the helpers used the decompiled code.
+
+emit-model-header artifact#
+
+revng artifact emit-model-header
+Step: emit-model-header
+
+File name: types-and-globals.h
+
+This artifact contains all the declaration of types, functions and segments defined in the binary.
+
+emit-type-definitions artifact#
+
+revng artifact emit-type-definitions
+Step: emit-type-definitions
+
+File name: model-type-definitions.tar.gz
+
+This artifact is an archive of plain C headers. Each file contains the declaration of a type defined for this binary. This artifact is designed to be used as the initial input of the import-from-c analysis. In fact, this artifact is designed to be easily editable by the end-user; it's not designed to represent valid C code, unlike the emit-model-header artifact.
+
+cleanup-ir artifact#
+
+revng artifact cleanup-ir
+Step: cleanup-ir
+
+File name: functions.bc.zstd
+
+This artifact contains one LLVM function for each function defined in this binary.
+
+The output is similar to the output of make-segment-ref but it's cleaned up from rev.ng-specific artifacts in order to be more easily consumed as standard LLVM IR.
+
+This is an appropriate artifact on top of which write analyses, such as a taint analysis.
+
+emit-c artifact#
+
+revng artifact emit-c
+Step: emit-c
+
+File name: decompiled.tar.gz
+
+This artifact contains a C function for each function in the input program.
+
+emit-c-as-single-file artifact#
+
+revng artifact emit-c-as-single-file
+Step: emit-c-as-single-file
+
+File name: decompiled.c
+
+This artifact is a single PTML file representing the decompiled C code of the whole program, including the body of all of program's functions. (Clift backend)

@@ -10,3 +10,7 @@ $ python -m venv venv
 $ source venv/bin/activate
 $ pip install --upgrade pip wheel certifi
 $ pip install https://github.com/revng/revng-orchestra/archive/master.zip
+$ python -m venv venv
+$ source venv/bin/activate
+$ pip install --upgrade pip wheel certifi
+$ pip install https://github.com/revng/revng-orchestra/archive/master.zip

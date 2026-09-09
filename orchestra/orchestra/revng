@@ -1,0 +1,12 @@
+--- a/.orchestra/config/user_options.yml
++++ b/.orchestra/config/user_options.yml
+@@ -11,6 +11,6 @@
+ binary_archives:
+   - origin: "https://rev.ng/gitlab/revng/binary-archives.git"
+
+-#! #@overlay/replace
+-#! build_from_source:
+-#! qp  - component-name
++#@overlay/replace
++build_from_source:
++  - revng 
